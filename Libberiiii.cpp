@@ -3,243 +3,228 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
+#include <memory>
 using namespace std;
 
-struct Student {
-    string fio;
-    string gruppa;
-    vector<int> ocenki;
+class Book {
+private:
+    int id;
+    string name;
+    string author;
+    bool vydana;
+
+public:
+    Book(int i, string n, string a) {
+        id = i;
+        name = n;
+        author = a;
+        vydana = false;
+    }
+
+    int getId() { return id; }
+    string getName() { return name; }
+    bool getVydana() { return vydana; }
+
+    void setName(string n) { name = n; }
+    void setAuthor(string a) { author = a; }
+    void setVydana(bool v) { vydana = v; }
+
+    void show() {
+        cout << id << ". " << name << " - " << author;
+        if (vydana) cout << " (выдана)";
+        else cout << " (свободна)";
+        cout << endl;
+    }
 };
 
-struct Group {
-    string nazvanie;
+class Reader {
+private:
+    int id;
+    string name;
+
+public:
+    Reader(int i, string n) {
+        id = i;
+        name = n;
+    }
+
+    int getId() { return id; }
+    string getName() { return name; }
+
+    void setName(string n) { name = n; }
+
+    void show() {
+        cout << id << ". " << name << endl;
+    }
 };
 
-vector<Student> students;
-vector<Group> gruppy;
+class Library {
+private:
+    vector<shared_ptr<Book>> books;
+    vector<unique_ptr<Reader>> readers;
+    int bookId = 4;
+    int readerId = 3;
 
-void dobavit() {
-    Student s;
+public:
+    Library() {
+        books.push_back(make_shared<Book>(1, "Евгений Онегин", "Пушкин"));
+        books.push_back(make_shared<Book>(2, "Мастер и Маргарита", "Булгаков"));
+        books.push_back(make_shared<Book>(3, "Преступление и наказание", "Достоевский"));
 
-    cin.ignore();
-    cout << "ФИО: ";
-    getline(cin, s.fio);
-
-    cout << "Группа: ";
-    getline(cin, s.gruppa);
-
-    students.push_back(s);
-}
-
-void pokazat() {
-    for (int i = 0; i < students.size(); i++) {
-        cout << i + 1 << ". " << students[i].fio
-            << " | " << students[i].gruppa << endl;
+        readers.push_back(make_unique<Reader>(1, "Иван"));
+        readers.push_back(make_unique<Reader>(2, "Анна"));
     }
-}
 
-void izmenit() {
-    pokazat();
+    void menu() {
+        int v;
 
-    int n;
-    cout << "Номер студента: ";
-    cin >> n;
+        do {
+            cout << "\n--- БИБЛИОТЕКА ---\n 1. Книги\n 2. Добавить книгу\n 3. Изменить книгу\n 4. Удалить книгу\n 5. Читатели\n 6. Добавить читателя\n 7. Изменить читателя\n 8. Удалить читателя\n 9. Выдать книгу\n 10. Книги читателя\n 11. Статистика\n 0. Выход\n";
+            cout << "Выбор: ";
+            cin >> v;
 
-    if (n >= 1 && n <= students.size()) {
-        Student& s = students[n - 1];
-
-        cin.ignore();
-        cout << "Новое ФИО: ";
-        getline(cin, s.fio);
-
-        cout << "Новая группа: ";
-        getline(cin, s.gruppa);
-    }
-}
-
-void udalit() {
-    pokazat();
-
-    int n;
-    cout << "Номер студента: ";
-    cin >> n;
-
-    if (n >= 1 && n <= students.size()) {
-        students.erase(students.begin() + n - 1);
-    }
-}
-
-void dobavitOcenku() {
-    pokazat();
-
-    int n, ocenka;
-    cout << "Номер студента: ";
-    cin >> n;
-
-    if (n >= 1 && n <= students.size()) {
-        cout << "Оценка от 2 до 5: ";
-        cin >> ocenka;
-
-        if (ocenka >= 2 && ocenka <= 5) {
-            Student* s = &students[n - 1];
-            s->ocenki.push_back(ocenka);
-        }
-    }
-}
-
-void sredniyBall() {
-    pokazat();
-
-    int n, summa = 0;
-    cout << "Номер студента: ";
-    cin >> n;
-
-    if (n >= 1 && n <= students.size()) {
-        Student& s = students[n - 1];
-
-        for (int ocenka : s.ocenki) {
-            summa += ocenka;
-        }
-
-        if (!s.ocenki.empty()) {
-            cout << "Средний балл: "
-                << (double)summa / s.ocenki.size() << endl;
-        }
-        else {
-            cout << "Оценок нет.\n";
-        }
-    }
-}
-
-void dobavitGruppu() {
-    Group g;
-
-    cin.ignore();
-    cout << "Название группы: ";
-    getline(cin, g.nazvanie);
-
-    gruppy.push_back(g);
-}
-
-void pokazatGruppy() {
-    for (int i = 0; i < gruppy.size(); i++) {
-        cout << i + 1 << ". " << gruppy[i].nazvanie << endl;
-    }
-}
-
-void izmenitGruppu() {
-    pokazatGruppy();
-
-    int n;
-    cout << "Номер группы: ";
-    cin >> n;
-
-    if (n >= 1 && n <= gruppy.size()) {
-        string staraya = gruppy[n - 1].nazvanie;
-
-        cin.ignore();
-        cout << "Новое название: ";
-        getline(cin, gruppy[n - 1].nazvanie);
-
-        for (Student& s : students) {
-            if (s.gruppa == staraya) {
-                s.gruppa = gruppy[n - 1].nazvanie;
+            if (v == 1) {
+                for (auto b : books) b->show();
             }
-        }
-    }
-}
 
-void udalitGruppu() {
-    pokazatGruppy();
-
-    int n;
-    cout << "Номер группы: ";
-    cin >> n;
-
-    if (n >= 1 && n <= gruppy.size()) {
-        string nazvanie = gruppy[n - 1].nazvanie;
-        bool est = false;
-
-        for (Student& s : students) {
-            if (s.gruppa == nazvanie) {
-                est = true;
+            if (v == 2) {
+                string n, a;
+                cin.ignore();
+                cout << "Название: ";
+                getline(cin, n);
+                cout << "Автор: ";
+                getline(cin, a);
+                books.push_back(make_shared<Book>(bookId++, n, a));
             }
-        }
 
-        if (est) {
-            cout << "В группе есть студенты. Удаление невозможно.\n";
-        }
-        else {
-            gruppy.erase(gruppy.begin() + n - 1);
-            cout << "Группа удалена.\n";
-        }
-    }
-}
+            if (v == 3) {
+                int id;
+                cout << "ID книги: ";
+                cin >> id;
 
-void statistika() {
-    pokazatGruppy();
+                for (auto b : books) {
+                    if (b->getId() == id) {
+                        string n, a;
+                        cin.ignore();
+                        cout << "Новое название: ";
+                        getline(cin, n);
+                        cout << "Новый автор: ";
+                        getline(cin, a);
+                        b->setName(n);
+                        b->setAuthor(a);
+                    }
+                }
+            }
 
-    int n;
-    cout << "Номер группы: ";
-    cin >> n;
+            if (v == 4) {
+                int id;
+                cout << "ID книги: ";
+                cin >> id;
 
-    if (n >= 1 && n <= gruppy.size()) {
-        int otlichniki = 0, horoshisty = 0;
+                for (int i = 0; i < books.size(); i++) {
+                    if (books[i]->getId() == id && !books[i]->getVydana()) {
+                        books.erase(books.begin() + i);
+                        break;
+                    }
+                }
+            }
 
-        for (Student& s : students) {
-            if (s.gruppa == gruppy[n - 1].nazvanie &&
-                !s.ocenki.empty()) {
+            if (v == 5) {
+                for (auto& r : readers) r->show();
+            }
 
-                int summa = 0;
+            if (v == 6) {
+                string n;
+                cin.ignore();
+                cout << "Имя читателя: ";
+                getline(cin, n);
+                readers.push_back(make_unique<Reader>(readerId++, n));
+            }
 
-                for (int ocenka : s.ocenki) {
-                    summa += ocenka;
+            if (v == 7) {
+                int id;
+                cout << "ID читателя: ";
+                cin >> id;
+
+                for (auto& r : readers) {
+                    if (r->getId() == id) {
+                        string n;
+                        cin.ignore();
+                        cout << "Новое имя: ";
+                        getline(cin, n);
+                        r->setName(n);
+                    }
+                }
+            }
+
+            if (v == 8) {
+                int id;
+                cout << "ID читателя: ";
+                cin >> id;
+
+                for (int i = 0; i < readers.size(); i++) {
+                    if (readers[i]->getId() == id) {
+                        readers.erase(readers.begin() + i);
+                        break;
+                    }
+                }
+            }
+
+            if (v == 9) {
+                int b, r;
+                cout << "ID книги: ";
+                cin >> b;
+                cout << "ID читателя: ";
+                cin >> r;
+
+                for (auto book : books) {
+                    if (book->getId() == b && !book->getVydana()) {
+                        for (auto& reader : readers) {
+                            if (reader->getId() == r) {
+                                book->setVydana(true);
+                                cout << "Книга выдана!\n";
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (v == 10) {
+                int id;
+                cout << "ID читателя: ";
+                cin >> id;
+                cout << "Книги читателя:\n";
+
+                for (auto b : books) {
+                    if (b->getVydana())
+                        b->show();
+                }
+            }
+
+            if (v == 11) {
+                int free = 0, issued = 0;
+
+                for (auto b : books) {
+                    if (b->getVydana()) issued++;
+                    else free++;
                 }
 
-                double ball = (double)summa / s.ocenki.size();
-
-                if (ball >= 4.5) otlichniki++;
-                else if (ball >= 3.5) horoshisty++;
+                cout << "Всего книг: " << books.size() << endl;
+                cout << "Свободно: " << free << endl;
+                cout << "Выдано: " << issued << endl;
+                cout << "Читателей: " << readers.size() << endl;
             }
-        }
 
-        cout << "Отличников: " << otlichniki << endl;
-        cout << "Хорошистов: " << horoshisty << endl;
+        } while (v != 0);
     }
-}
+};
 
 int main() {
     SetConsoleCP(65001);
     SetConsoleOutputCP(65001);
 
-    gruppy.push_back({ "БД-1-25" });
-    gruppy.push_back({ "БД-2-25" });
-
-    students.push_back({ "Комлев Кирилл", "БД-1-25", {2, 2, 3} });
-    students.push_back({ "Вепрева Мила", "БД-1-25", {5, 5, 4} });
-    students.push_back({ "Соседова Варвара", "БД-2-25", {5, 5, 4} });
-
-    int v;
-
-    do {
-        cout << "\n=== УЧЕБНАЯ ГРУППА ===\n 1. Добавить студента\n 2. Показать студентов\n 3. Изменить студента\n 4. Удалить студента\n 5. Добавить оценку\n 6. Средний балл студента\n 7. Добавить группу\n 8. Показать группы\n 9. Изменить группу\n 10. Удалить группу\n 11. Статистика группы\n 0. Выход\n";
-        cout << "Ваш выбор: ";
-        cin >> v;
-
-        if (v == 1) dobavit();
-        if (v == 2) pokazat();
-        if (v == 3) izmenit();
-        if (v == 4) udalit();
-        if (v == 5) dobavitOcenku();
-        if (v == 6) sredniyBall();
-        if (v == 7) dobavitGruppu();
-        if (v == 8) pokazatGruppy();
-        if (v == 9) izmenitGruppu();
-        if (v == 10) udalitGruppu();
-        if (v == 11) statistika();
-
-    } while (v != 0);
+    Library lib;
+    lib.menu();
 
     return 0;
 }
