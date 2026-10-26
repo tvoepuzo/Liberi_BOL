@@ -23,10 +23,10 @@ public:
 
     int getId() { return id; }
     string getName() { return name; }
-    bool getVydana() { return vydana; }
+    bool getVydana() { return vydana; }       // метод получения данных
 
     void setName(string n) { name = n; }
-    void setAuthor(string a) { author = a; }
+    void setAuthor(string a) { author = a; }        // метод изменения данных
     void setVydana(bool v) { vydana = v; }
 
     void show() {
@@ -83,8 +83,8 @@ public:
             cout << "Выбор: ";
             cin >> v;
 
-            if (v == 1) {
-                for (auto b : books) b->show();
+            if (v == 1) {                         // просмотр книг
+                for (auto b : books) b->show();   // в B записывается первый элемент из BOOKS, выполняет функцию SHOW используя значение из B, повторяет это со всеми последующими элементами лежащие в BOOKS
             }
 
             if (v == 2) {
@@ -130,7 +130,7 @@ public:
             }
 
             if (v == 5) {
-                for (auto& r : readers) r->show();
+                for (auto& r : readers) r->show();        // просмотор читателей
             }
 
             if (v == 6) {
